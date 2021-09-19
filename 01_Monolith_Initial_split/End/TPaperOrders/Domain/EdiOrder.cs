@@ -16,8 +16,6 @@ namespace TPaperOrders
 
         public int? DeliveryId { get; set; }
 
-        public Delivery Delivery { get; set; }
-
         public bool IsValid()
         {
             return Quantity > 0;

@@ -37,21 +37,35 @@ namespace TPaperOrders
                     configuration.GetSection("ProjectOptions").Bind(settings);
                 });
 
-            string sqlString = Environment.GetEnvironmentVariable("SqlPaperString");
+            string sqlPaperString = Environment.GetEnvironmentVariable("SqlPaperString");
             string sqlPassword = Environment.GetEnvironmentVariable("SqlPaperPassword");
-            string connectionString = new SqlConnectionStringBuilder(sqlString) { Password = sqlPassword }.ConnectionString;
+            string paperConnectionString = new SqlConnectionStringBuilder(sqlPaperString) { Password = sqlPassword }.ConnectionString;
 
             services.AddDbContextPool<PaperDbContext>(options =>
             {
-                if (!string.IsNullOrEmpty(connectionString))
+                if (!string.IsNullOrEmpty(paperConnectionString))
                 {
-                    options.UseSqlServer(connectionString, providerOptions => providerOptions.EnableRetryOnFailure());
+                    options.UseSqlServer(paperConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
                 }
             });
 
-            PaperDbContext.ExecuteMigrations(connectionString);
+            PaperDbContext.ExecuteMigrations(paperConnectionString);
 
+            string sqlDeliveryString = Environment.GetEnvironmentVariable("SqlDeliveryString");
+            string deliveryConnectionString = new SqlConnectionStringBuilder(sqlDeliveryString) { Password = sqlPassword }.ConnectionString;
+
+            services.AddDbContextPool<DeliveryDbContext>(options =>
+            {
+                if (!string.IsNullOrEmpty(deliveryConnectionString))
+                {
+                    options.UseSqlServer(deliveryConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
+                }
+            });
+
+            DeliveryDbContext.ExecuteMigrations(deliveryConnectionString);
+            
             services.AddControllers();
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
