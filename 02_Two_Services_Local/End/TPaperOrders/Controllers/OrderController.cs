@@ -1,8 +1,7 @@
+using Dapr.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,14 +18,18 @@ namespace TPaperOrders
 
         private readonly IHttpClientFactory _clientFactory;
 
+        private readonly DaprClient _daprClient;
+
         public OrderController(
             PaperDbContext context,
             ILogger<OrderController> logger,
-            IHttpClientFactory clientFactory)
+            IHttpClientFactory clientFactory,
+            DaprClient daprClient)
         {
             _context = context;
             _logger = logger;
             _clientFactory = clientFactory;
+            _daprClient = daprClient ?? throw new ArgumentNullException(nameof(daprClient));
         }
 
         [HttpGet]
@@ -56,21 +59,13 @@ namespace TPaperOrders
 
         private async Task<DeliveryModel> CreateDeliveryForOrder(EdiOrder savedOrder, CancellationToken cts)
         {
-            string url =
-                $"http://localhost:35773/api/delivery/create/{savedOrder.ClientId}/{savedOrder.Id}/{savedOrder.ProductCode}/{savedOrder.Quantity}";
 
-            using var httpClient = _clientFactory.CreateClient();
-            var uriBuilder = new UriBuilder(url);
+            var route = $"api/delivery/create/{savedOrder.ClientId}/{savedOrder.Id}/{savedOrder.ProductCode}/{savedOrder.Quantity}";
 
-            using var result = await httpClient.GetAsync(uriBuilder.Uri);
-            if (!result.IsSuccessStatusCode)
-            {
-                return null;
-            }
+            DeliveryModel savedDelivery = await _daprClient.InvokeMethodAsync<DeliveryModel>(
+                HttpMethod.Get, "tpaperdelivery", route, cts);
 
-            var content = await result.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<DeliveryModel>(content);
+            return savedDelivery;
         }
     }
 }

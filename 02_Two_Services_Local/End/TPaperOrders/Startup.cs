@@ -35,6 +35,7 @@ namespace TPaperOrders
 
             string sqlPaperString = Environment.GetEnvironmentVariable("SqlPaperString");
             string sqlPassword = Environment.GetEnvironmentVariable("SqlPaperPassword");
+
             string paperConnectionString = new SqlConnectionStringBuilder(sqlPaperString) { Password = sqlPassword }.ConnectionString;
 
             services.AddDbContextPool<PaperDbContext>(options =>
@@ -47,7 +48,7 @@ namespace TPaperOrders
 
             PaperDbContext.ExecuteMigrations(paperConnectionString);
 
-            services.AddControllers();
+            services.AddControllers().AddDapr();
             services.AddHttpClient();
         }
 

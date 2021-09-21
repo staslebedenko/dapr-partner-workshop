@@ -35,6 +35,7 @@ namespace TPaperDelivery
 
             string sqlDeliveryString = Environment.GetEnvironmentVariable("SqlDeliveryString");
             string sqlPassword = Environment.GetEnvironmentVariable("SqlPaperPassword");
+
             string deliveryConnectionString = new SqlConnectionStringBuilder(sqlDeliveryString) { Password = sqlPassword }.ConnectionString;
 
             services.AddDbContextPool<DeliveryDbContext>(options =>
