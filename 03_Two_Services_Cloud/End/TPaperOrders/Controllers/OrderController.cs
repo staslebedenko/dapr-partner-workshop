@@ -16,19 +16,15 @@ namespace TPaperOrders
 
         private readonly ILogger<OrderController> _logger;
 
-        private readonly IHttpClientFactory _clientFactory;
-
         private readonly DaprClient _daprClient;
 
         public OrderController(
             PaperDbContext context,
             ILogger<OrderController> logger,
-            IHttpClientFactory clientFactory,
             DaprClient daprClient)
         {
             _context = context;
             _logger = logger;
-            _clientFactory = clientFactory;
             _daprClient = daprClient ?? throw new ArgumentNullException(nameof(daprClient));
         }
 
