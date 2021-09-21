@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  tpaperdelivery:
+    image: ${DOCKER_REGISTRY-}tpaperdelivery
+    build:
+      context: .
+      dockerfile: TPaperDelivery/Dockerfile
+
+  tpaperorders:
+    image: ${DOCKER_REGISTRY-}tpaperorders
+    build:
+      context: .
+      dockerfile: TPaperOrders/Dockerfile
+
