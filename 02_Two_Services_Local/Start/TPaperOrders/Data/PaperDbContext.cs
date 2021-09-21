@@ -10,16 +10,8 @@ namespace TPaperOrders
         {
         }
 
-        public DbSet<Client> Client { get; set; }
-        
-        public DbSet<Delivery> Delivery { get; set; }
-        
         public DbSet<EdiOrder> EdiOrder { get; set; }
         
-        public DbSet<Inventory> Inventory { get; set; }
-        
-        public DbSet<Product> Product { get; set; }
-
         public static void ExecuteMigrations(string connectionString)
         {
             var optionsBuilder = new DbContextOptionsBuilder<PaperDbContext>();
@@ -38,14 +30,15 @@ namespace TPaperOrders
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("dbo");
             PaperContextConfiguration.Configure(modelBuilder);
             base.OnModelCreating(modelBuilder);
         }
 
         /*
-         * dotnet ef migrations add InitialMigration --context PaperDbContext
+         * dotnet ef migrations add SecondMigration --context PaperDbContext
          * dotnet ef database update
-         * dotnet ef migrations remove
+         * dotnet ef migrations remove --context PaperDbContext
         */
     }
 }

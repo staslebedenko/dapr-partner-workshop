@@ -3,19 +3,19 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using TPaperDelivery;
 
-namespace TPaperOrders.Migrations
+namespace TPaperDelivery.Migrations.DeliveryDb
 {
-    [DbContext(typeof(PaperDbContext))]
-    [Migration("20201216214021_InitialMigration")]
-    partial class InitialMigration
+    [DbContext(typeof(DeliveryDbContext))]
+    partial class DeliveryDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("delivery")
                 .HasAnnotation("ProductVersion", "3.1.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -59,9 +59,6 @@ namespace TPaperOrders.Migrations
                     b.Property<int>("EdiOrderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EdiOrderId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
@@ -76,38 +73,10 @@ namespace TPaperOrders.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EdiOrderId1");
+                    b.HasIndex("EdiOrderId")
+                        .IsUnique();
 
                     b.ToTable("Delivery");
-                });
-
-            modelBuilder.Entity("TPaperOrders.EdiOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeliveryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductCode")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeliveryId");
-
-                    b.ToTable("EdiOrder");
                 });
 
             modelBuilder.Entity("TPaperOrders.Inventory", b =>
@@ -151,21 +120,6 @@ namespace TPaperOrders.Migrations
                             ExternalCode = 1,
                             Name = "Sample"
                         });
-                });
-
-            modelBuilder.Entity("TPaperOrders.Delivery", b =>
-                {
-                    b.HasOne("TPaperOrders.EdiOrder", "EdiOrder")
-                        .WithMany()
-                        .HasForeignKey("EdiOrderId1");
-                });
-
-            modelBuilder.Entity("TPaperOrders.EdiOrder", b =>
-                {
-                    b.HasOne("TPaperOrders.Delivery", "Delivery")
-                        .WithMany("Orders")
-                        .HasForeignKey("DeliveryId")
-                        .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
         }

@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:11978",
+      "applicationUrl": "http://localhost:35773",
       "sslPort": 0
     }
   },
@@ -12,15 +12,15 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/order/create/1",
+      "launchUrl": "api/delivery/get",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "TPaperOrders": {
+    "TPaperDelivery": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/order/create/1",
+      "launchUrl": "api/delivery/get",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -29,7 +29,7 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/order/create/1",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/delivery/get",
       "publishAllPorts": true
     }
   }

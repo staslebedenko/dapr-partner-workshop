@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace TPaperOrders
+namespace TPaperDelivery
 {
     public class Startup
     {
@@ -24,7 +24,7 @@ namespace TPaperOrders
         {
             services.AddLogging(options =>
             {
-                options.AddFilter("TPaperOrders", LogLevel.Information);
+                options.AddFilter("TPaperDelivery", LogLevel.Information);
             });
 
             services.AddOptions<ProjectOptions>()
@@ -33,19 +33,19 @@ namespace TPaperOrders
                     configuration.GetSection("ProjectOptions").Bind(settings);
                 });
 
-            string sqlPaperString = Environment.GetEnvironmentVariable("SqlPaperString");
+            string sqlDeliveryString = Environment.GetEnvironmentVariable("SqlDeliveryString");
             string sqlPassword = Environment.GetEnvironmentVariable("SqlPaperPassword");
-            string paperConnectionString = new SqlConnectionStringBuilder(sqlPaperString) { Password = sqlPassword }.ConnectionString;
+            string deliveryConnectionString = new SqlConnectionStringBuilder(sqlDeliveryString) { Password = sqlPassword }.ConnectionString;
 
-            services.AddDbContextPool<PaperDbContext>(options =>
+            services.AddDbContextPool<DeliveryDbContext>(options =>
             {
-                if (!string.IsNullOrEmpty(paperConnectionString))
+                if (!string.IsNullOrEmpty(deliveryConnectionString))
                 {
-                    options.UseSqlServer(paperConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
+                    options.UseSqlServer(deliveryConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
                 }
             });
 
-            PaperDbContext.ExecuteMigrations(paperConnectionString);
+            DeliveryDbContext.ExecuteMigrations(deliveryConnectionString);
 
             services.AddControllers();
             services.AddHttpClient();
