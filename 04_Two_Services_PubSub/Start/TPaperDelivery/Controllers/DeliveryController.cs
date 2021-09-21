@@ -2,54 +2,60 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapr;
+using Microsoft.Extensions.Logging;
 
 namespace TPaperDelivery
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class DeliveryController
     {
         private readonly DeliveryDbContext _context;
 
-        public DeliveryController(DeliveryDbContext context)
+        private readonly ILogger<DeliveryController> _logger;
+
+
+        public DeliveryController(DeliveryDbContext context, ILogger<DeliveryController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        [HttpGet]
-        [Route("create/{clientId}/{ediOrderId}/{productCode}/{number}")]
-        public async Task<IActionResult> ProcessEdiOrder(
-            int clientId,
-            int ediOrderId,
-            int productCode,
-            int number,
-            CancellationToken cts)
+        [Topic("pubsub", "createdelivery")]
+        [HttpPost]
+        [Route("createdelivery")]
+        public async Task<IActionResult> ProcessEdiOrder(Delivery delivery)
         {
-            Product product = await _context.Product.FirstOrDefaultAsync(x => x.ExternalCode == productCode, cts);
+            _logger.LogWarning("Triggered method"); 
+
+            Product product = await _context.Product.FirstOrDefaultAsync();
 
             var newDelivery = new Delivery
             {
                 Id = 0,
-                ClientId = clientId,
-                EdiOrderId = ediOrderId,
-                Number = number,
+                ClientId = delivery.ClientId,
+                EdiOrderId = delivery.EdiOrderId,
+                Number = delivery.Number,
                 ProductId = product.Id,
                 ProductCode = product.ExternalCode,
                 Notes = "Prepared for shipment"
             };
 
-            Delivery savedDelivery = (await _context.Delivery.AddAsync(newDelivery, cts)).Entity;
-            await _context.SaveChangesAsync(cts);
+            Delivery savedDelivery = (await _context.Delivery.AddAsync(newDelivery)).Entity;
+            await _context.SaveChangesAsync();
 
+            _logger.LogWarning("Saved delivery");
 
-            return new OkObjectResult(savedDelivery);
+            return new OkObjectResult("");
         }
 
         [HttpGet]
-        [Route("get")]
+        [Route("api/deliveries/get")]
         public async Task<IActionResult> Get(CancellationToken cts)
         {
-            return new OkObjectResult("Started");
+            Delivery[] registeredDeliveries = await _context.Delivery.ToArrayAsync(cts);
+
+            return new OkObjectResult(registeredDeliveries);
         }
     }
 }

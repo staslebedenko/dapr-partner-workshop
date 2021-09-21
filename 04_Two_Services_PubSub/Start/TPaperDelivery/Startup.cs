@@ -19,7 +19,7 @@ namespace TPaperDelivery
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container. 
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging(options =>
@@ -42,17 +42,17 @@ namespace TPaperDelivery
             {
                 if (!string.IsNullOrEmpty(deliveryConnectionString))
                 {
-                    options.UseSqlServer(deliveryConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
+                    options.UseSqlServer(deliveryConnectionString);
                 }
             });
 
             DeliveryDbContext.ExecuteMigrations(deliveryConnectionString);
 
-            services.AddControllers();
+            services.AddControllers().AddDapr();
             services.AddHttpClient();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -64,8 +64,11 @@ namespace TPaperDelivery
 
             app.UseAuthorization();
 
+            app.UseCloudEvents();
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapSubscribeHandler();
                 endpoints.MapControllers();
             });
         }
