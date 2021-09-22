@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: functionapp
+  labels:
+    app: functionapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: functionapp
+  template:
+    metadata:
+      labels:
+        app: functionapp
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "functionapp"
+        dapr.io/app-port: "3001"        
+        dapr.io/config: "appconfig"
+    spec:
+      containers:
+      - name: functionapp
+        image: msdaprregistry.azurecr.io/functionapp:v1
+        ports:
+        - containerPort: 3001
+        imagePullPolicy: Always
+        env:
+         - name: PubSubName
+          value: pubsub
