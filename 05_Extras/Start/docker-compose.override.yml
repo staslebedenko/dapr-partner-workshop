@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  tpaperorders:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+
+  tpaperdelivery:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+

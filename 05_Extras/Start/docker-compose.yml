@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+
+  tpaperorders:
+    image: ${DOCKER_REGISTRY-}tpaperorders
+    build:
+      context: .
+      dockerfile: TPaperOrders/Dockerfile
+    ports:
+      - "51000:50001"
+    env_file:
+      - settings.env
+
+  tpaperorders-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "tpaperorders", "-app-port", "80" ]
+    depends_on:
+      - tpaperorders
+    network_mode: "service:tpaperorders"
+
+  tpaperdelivery:
+    image: ${DOCKER_REGISTRY-}tpaperdelivery
+    build:
+      context: .
+      dockerfile: TPaperDelivery/Dockerfile
+    ports:
+      - "52000:50001"
+    env_file:
+      - settings.env
+
+  tpaperdelivery-dapr:
+    image: "daprio/daprd:latest"
+    command: [ "./daprd", "-app-id", "tpaperdelivery", "-app-port", "80" ]
+    depends_on:
+      - tpaperdelivery
+    network_mode: "service:tpaperdelivery"
