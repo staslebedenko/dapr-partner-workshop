@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: tpaperdelivery
-          image: netfwdaysregistry.azurecr.io/tpaperdelivery:v2
+          image: msactionregistry.azurecr.io/tpaperdelivery:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 80

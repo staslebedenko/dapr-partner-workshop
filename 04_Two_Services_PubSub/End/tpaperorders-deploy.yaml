@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: tpaperorders
-          image: netfwdaysregistry.azurecr.io/tpaperorders:v1
+          image: msdaprregistry.azurecr.io/tpaperorders:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
