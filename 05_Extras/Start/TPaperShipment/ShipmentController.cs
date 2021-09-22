@@ -9,7 +9,7 @@ namespace TPaperShipment
     {
         [FunctionName("ProcessShipment")]
         public static void ProcessShipment(
-            [DaprTopicTrigger("%PubSubName%", Topic = "shipment")] CloudEvent subEvent, ILogger log)
+            [DaprTopicTrigger("%PubSubName%", Topic = "createdelivery")] CloudEvent subEvent, ILogger log)
         {
             log.LogInformation("Shipment start from the Dapr Runtime.");
             log.LogInformation($"Topic Shipment received a message: {subEvent.Data}.");
