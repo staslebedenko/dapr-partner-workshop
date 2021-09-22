@@ -40,15 +40,15 @@ az account set --subscription $subscriptionID
 az account show
 
 location=northeurope
-postfix=$RANDOM
+postfix=
 
 #----------------------------------------------------------------------------------
 # Database infrastructure
 #----------------------------------------------------------------------------------
 
-export dbResourceGroup=net-fwdays-dapr-data$postfix
-export dbServername=net-fwdays-dapr$postfix
-export dbPoolname=fwdays
+export dbResourceGroup=ms-action-dapr-data$postfix
+export dbServername=ms-action-dapr$postfix
+export dbPoolname=dbpool
 export dbAdminlogin=FancyUser3
 export dbAdminpassword=Sup3rStr0ng52$postfix
 export dbPaperName=paperorders
@@ -85,15 +85,46 @@ SqlPaperPassword=$dbAdminpassword
 #----------------------------------------------------------------------------------
 
 location=northeurope
-groupName=netfwdays-cluster$postfix
-clusterName=netfwdays-cluster$postfix
-registryName=netfwdaysregistry$postfix
+groupName=msaction-cluster$postfix
+clusterName=msaction-cluster$postfix
+registryName=msactionregistry$postfix
 accountSku=Standard_LRS
-accountName=netfwdaysstorage$postfix
-queueName=netfwdaysqueue
-queueResultsName=netfwdaysqueueresults
+accountName=msactionstorage$postfix
+queueName=msactionqueue
+queueResultsName=msactionqueueresults
 
 az group create --name $groupName --location $location
+
+az acr create --resource-group $groupName --name $registryName --sku Standard
+az acr identity assign --identities [system] --name $registryName
+
+az aks create --resource-group $groupName --name $clusterName --node-count 3 --generate-ssh-keys --network-plugin azure
+az aks update --resource-group $groupName --name $clusterName --attach-acr $registryName
+
+#----------------------------------------------------------------------------------
+# Service bus queue and application insights
+#----------------------------------------------------------------------------------
+
+groupName=ms-action-dapr-extras$postfix
+az group create --name $groupName --location $location
+namespaceName=msActionDapr$RANDOM
+queueName=createdelivery
+
+az servicebus namespace create --resource-group $groupName --name $namespaceName --location $location
+az servicebus queue create --resource-group $groupName --name $queueName --namespace-name $namespaceName
+serviceBusString=$(az servicebus namespace authorization-rule keys list --resource-group $groupName --namespace-name $namespaceName --name RootManageSharedAccessKey --query primaryConnectionString --output tsv)
+
+insightsName=msactiondaprlogs
+az monitor app-insights component create --resource-group $groupName --app $insightsName --location $location --kind web --application-type web --retention-time 120
+
+instrumentationKey=$(az monitor app-insights component show --resource-group $groupName --app $insightsName --query  "instrumentationKey" --output tsv)
+
+#----------------------------------------------------------------------------------
+# Service bus queue and application insights
+#----------------------------------------------------------------------------------
+
+accountSku=Standard_LRS
+accountName=msactionstorage$postfix
 
 az storage account create --name $accountName --location $location --kind StorageV2 \
 --resource-group $groupName --sku $accountSku --access-tier Hot  --https-only true
@@ -102,19 +133,17 @@ accountKey=$(az storage account keys list --resource-group $groupName --account-
 
 accountConnString="DefaultEndpointsProtocol=https;AccountName=$accountName;AccountKey=$accountKey;EndpointSuffix=core.windows.net"
 
-az storage queue create --name $queueName --account-key $accountKey \
---account-name $accountName --connection-string $accountConnString
+applicationName=msactiondaprfunc$postfix
+echo "applicationName  = " $applicationName
 
-az storage queue create --name $queueResultsName --account-key $accountKey \
---account-name $accountName --connection-string $accountConnString
+az functionapp create --resource-group $groupName \
+--name $applicationName --storage-account $accountName \
+--consumption-plan-location $location --functions-version 3
 
-az acr create --resource-group $groupName --name $registryName --sku Standard
-az acr identity assign --identities [system] --name $registryName
-
-az aks create --resource-group $groupName --name $clusterName --node-count 3 --generate-ssh-keys --network-plugin azure
-az aks update --resource-group $groupName --name $clusterName --attach-acr $registryName
-
-echo "Update local.settings.json Values=>AzureWebJobsStorage value with:  " $accountConnString
+az functionapp update --resource-group $groupName --name $applicationName --set dailyMemoryTimeQuota=400000
+az functionapp config appsettings set --resource-group $groupName --name $applicationName --settings "MSDEPLOY_RENAME_LOCKED_FILES=1"
+az functionapp config appsettings set --resource-group $groupName --name $applicationName --settings ASPNETCORE_ENVIRONMENT=Production
+az functionapp config appsettings set --resource-group $groupName --name $applicationName --settings "StorageConnectionString=$accountConnString"
 
 #----------------------------------------------------------------------------------
 # SQL connection strings
@@ -123,8 +152,31 @@ echo "Update local.settings.json Values=>AzureWebJobsStorage value with:  " $acc
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlPaperString:\nsetx SqlPaperString \"$SqlPaperString\"\n\n"
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlDeliveryString:\nsetx SqlDeliveryString \"$SqlDeliveryString\"\n\n"
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlPaperPassword:\nsetx SqlPaperPassword \"$SqlPaperPassword\"\n\n"
+printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlPaperPassword:\nsetx SqlDeliveryPassword \"$SqlPaperPassword\"\n\n"
+printf "\n\nRun string below in local cmd prompt to assign secret to environment variable AzureWebJobsStorage:\nsetx AzureWebJobsStorage \"$accountConnString\"\n\n"
 
+echo "Update open-telemetry-collector-appinsights.yaml in Step 4 End => <INSTRUMENTATION-KEY> value with:  " $instrumentationKey
 ```
+
+Important thing is to setup network connectivity between deployed kubernetes cluster and deployed database.
+
+There are two steps to do it via Azure Portal.
+
+Kubernetes connectivity
+* Navigate into resource group MC_msaction-cluster_msaction-cluster_northeurope and open
+* Open Virtual network there
+* Open Service endpoints and click add
+* Select Microsoft.SQL from dropdown and select aks-vnet in the next dropdown.
+* Add additional integration with Microsoft.ServiceBus
+
+SQL Server connectivity.
+* Navigate to the resource group - ms-action-dapr-data
+* Open Sql Server ms-action-dapr
+* Click Show Firewall
+* On top click add client IP address, so you can access sql server from your work machine
+* Click  Add existing virtual network + Create new virtual network
+* Add aks-vnet with a proper name(check name via AKS cluster group)
+* Most important step - click Save in the portal UI
 
 ## Step 1. Monolithic Web API initial split.
 

@@ -19,10 +19,11 @@ spec:
         dapr.io/app-id: "tpaperorders"
         dapr.io/app-port: "80"
         dapr.io/log-level: debug
+        dapr.io/config: "appconfig"
     spec:
       containers:
         - name: tpaperorders
-          image: netfwdaysregistry.azurecr.io/tpaperorders:v2
+          image: netfwdaysregistry.azurecr.io/tpaperorders:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80

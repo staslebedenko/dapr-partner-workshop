@@ -19,10 +19,11 @@ spec:
         dapr.io/app-id: "tpaperdelivery"
         dapr.io/app-port: "80"
         dapr.io/log-level: debug
+        dapr.io/config: "appconfig"
     spec:
       containers:
         - name: tpaperdelivery
-          image: netfwdaysregistry.azurecr.io/tpaperdelivery:v2
+          image: netfwdaysregistry.azurecr.io/tpaperdelivery:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
