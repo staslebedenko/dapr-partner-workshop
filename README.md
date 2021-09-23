@@ -40,7 +40,7 @@ az account set --subscription $subscriptionID
 az account show
 
 location=northeurope
-postfix=
+postfix=$RANDOM
 
 #----------------------------------------------------------------------------------
 # Database infrastructure
@@ -85,7 +85,7 @@ SqlPaperPassword=$dbAdminpassword
 #----------------------------------------------------------------------------------
 
 location=northeurope
-groupName=msaction-cluster$postfix
+groupName=ms-action-dapr-cluster$postfix
 clusterName=msaction-cluster$postfix
 registryName=msactionregistry$postfix
 accountSku=Standard_LRS
@@ -120,7 +120,7 @@ az monitor app-insights component create --resource-group $groupName --app $insi
 instrumentationKey=$(az monitor app-insights component show --resource-group $groupName --app $insightsName --query  "instrumentationKey" --output tsv)
 
 #----------------------------------------------------------------------------------
-# Service bus queue and application insights
+# Service bus queue, application insights and Azure Key Vault
 #----------------------------------------------------------------------------------
 
 accountSku=Standard_LRS
@@ -145,6 +145,21 @@ az functionapp config appsettings set --resource-group $groupName --name $applic
 az functionapp config appsettings set --resource-group $groupName --name $applicationName --settings ASPNETCORE_ENVIRONMENT=Production
 az functionapp config appsettings set --resource-group $groupName --name $applicationName --settings "StorageConnectionString=$accountConnString"
 
+keyvaultName=msActionDapr
+principalName=vaultadmin
+principalCertName=vaultadmincert
+
+az keyvault create --resource-group $groupName --name $keyvaultName --location $location
+az keyvault secret set --name SqlPaperPassword --vault-name $keyvaultName --value $SqlPaperPassword
+
+az ad sp create-for-rbac --name $principalName --create-cert --cert $principalCertName --keyvault $keyvaultName --skip-assignment --years 3
+
+# get appId from output of this step and use commented code below to grant access.
+
+# az ad sp show --id 88511b82-8ced-4ba3-bd9b-0599f479e870
+# get objectId from command output above and set it to command below 
+
+# az keyvault set-policy --name $keyvaultName --object-id b3535a27-26f0-4c59-a50a-bd13886e4185 --secret-permissions get
 #----------------------------------------------------------------------------------
 # SQL connection strings
 #----------------------------------------------------------------------------------
@@ -152,7 +167,7 @@ az functionapp config appsettings set --resource-group $groupName --name $applic
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlPaperString:\nsetx SqlPaperString \"$SqlPaperString\"\n\n"
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlDeliveryString:\nsetx SqlDeliveryString \"$SqlDeliveryString\"\n\n"
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlPaperPassword:\nsetx SqlPaperPassword \"$SqlPaperPassword\"\n\n"
-printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlPaperPassword:\nsetx SqlDeliveryPassword \"$SqlPaperPassword\"\n\n"
+printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlDeliveryPassword:\nsetx SqlDeliveryPassword \"$SqlPaperPassword\"\n\n"
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable AzureWebJobsStorage:\nsetx AzureWebJobsStorage \"$accountConnString\"\n\n"
 
 echo "Update open-telemetry-collector-appinsights.yaml in Step 4 End => <INSTRUMENTATION-KEY> value with:  " $instrumentationKey
