@@ -34,7 +34,11 @@ spec:
             - name: SqlPaperString
               value: Server=tcp:net-fwdays-dapr.database.windows.net,1433;Initial Catalog=paperorders;Persist Security Info=False;User ID=FancyUser3;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
             - name: SqlPaperPassword
-              value: Sup3rStr0ng52
+              secretKeyRef:
+                name: SqlPaperPassword
+                key: SqlPaperPassword
+      auth:
+          secretStore: azurekeyvault
 ---
 apiVersion: v1
 kind: Service

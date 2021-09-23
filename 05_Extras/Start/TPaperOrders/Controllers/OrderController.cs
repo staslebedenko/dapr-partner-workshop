@@ -2,6 +2,7 @@ using Dapr.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +51,10 @@ namespace TPaperOrders
 
             Delivery savedDelivery = await CreateDeliveryForOrder(savedOrder, cts);
 
-            string responseMessage = $"Accepted EDI message {order.Id} and created delivery {savedDelivery?.Id}";
+            Dictionary<string, string> secrets = await _daprClient.GetSecretAsync("azurekeyvault", "SqlPaperPassword");
+            string superSecret = secrets["SqlPaperPassword"];
+
+            string responseMessage = $"Accepted EDI message {order.Id} and created delivery {savedDelivery?.Id} with super secret{superSecret}";
 
             return new OkObjectResult(responseMessage);
         }

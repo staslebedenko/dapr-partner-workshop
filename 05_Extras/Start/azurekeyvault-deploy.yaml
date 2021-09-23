@@ -1,0 +1,15 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: azurekeyvault
+spec:
+  type: secretstores.azure.keyvault
+  metadata:
+  - name: vaultName
+    value: msActionDapr
+  - name: spnTenantId
+    value: "53e93ede-ec5b-4d7a-8376-48e080d23e88"
+  - name: spnClientId
+    value: "88511b82-8ced-4ba3-bd9b-0599f479e870"
+  - name: spnCertificate
+    key: msactiondapr-vaultadmincert-20210923.pfx
