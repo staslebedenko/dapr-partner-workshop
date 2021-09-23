@@ -310,6 +310,140 @@ kubectl logs tpaperdelivery-599b8cd4b7-8nxzz tpaperdelivery
 ```
 
 
+## Step 5. Secrets via Azure KeyVault and Azure functions component.
+
+* We created an Azure Key Vault with our infrastructure beforehand. 
+But steps below included just in case.
+
+```bash
+az keyvault create --resource-group $groupName --name $keyvaultName --location $location
+```
+
+* Create a service principal
+
+Create a service principal with a new certificate and store the 3-year certificate inside [your keyvault]'s certificate vault.
+
+> **Note** you can skip this step if you want to use an existing service principal for keyvault instead of creating new one
+
+```bash
+az ad sp create-for-rbac --name $principalName --create-cert --cert $principalCertName --keyvault $keyvaultName --skip-assignment --years 3
+
+{
+  "appId": "88511b82-8ced-4ba3-bd9b-0599f479e870",
+  "displayName": "vaultadmin",
+  "name": "88511b82-8ced-4ba3-bd9b-0599f479e870",
+  "password": null,
+  "tenant": "53e93ede-ec5b-4d7a-8376-48e080d23e88"
+}
+```
+
+**Save the both the appId and tenant from the output which will be used in the next step**
+
+* Get the Object Id for [your_service_principal_name]
+
+```bash
+az ad sp show --id 88511b82-8ced-4ba3-bd9b-0599f479e870
+
+{
+    ...
+  "objectId": "b3535a27-26f0-4c59-a50a-bd13886e4185",
+  "objectType": "ServicePrincipal",
+    ...
+}
+```
+
+* Grant the service principal the GET permission to your Azure Key Vault
+
+```bash
+az keyvault set-policy --name $keyvaultName --object-id b3535a27-26f0-4c59-a50a-bd13886e4185 --secret-permissions get
+```
+
+Now, your service principal has access to your keyvault,  you are ready to configure the secret store component to use secrets stored in your keyvault to access other components securely.
+
+* Download PFX cert from your Azure Keyvault via Portal
+  Go to your keyvault on Portal and download [certificate_name] pfx cert from certificate vault
+  
+* Create a kubernetes secret using the following command
+
+- **C:\3\msactiondapr-vaultadmincert-20210923.pfx** is the path of PFX cert file you downloaded before
+- **vaultsecret** is secret name in Kubernetes secret store
+
+```bash
+kubectl create secret generic vaultsecret --from-file="C:\3\msactiondapr-vaultadmincert-20210923.pfx"
+```
+
+2. Create azurekeyvault-deploy.yaml component file
+
+The component yaml refers to the Kubernetes secretstore using `auth` property and  `secretKeyRef` refers to the certificate stored in Kubernetes secret store.
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: azurekeyvault
+spec:
+  type: secretstores.azure.keyvault
+  metadata:
+  - name: vaultName
+    value: msActionDapr
+  - name: spnTenantId
+    value: "53e93ede-ec5b-4d7a-8376-48e080d23e88"
+  - name: spnClientId
+    value: "88511b82-8ced-4ba3-bd9b-0599f479e870"
+  - name: spnCertificate
+    secretKeyRef:
+      name: vaultsecret
+      key: msactiondapr-vaultadmincert-20210923.pfx
+auth:
+    secretStore: kubernetes
+```
+
+3. Apply azurekeyvault.yaml component
+
+```bash
+kubectl apply -f azurekeyvault-deploy.yaml
+```
+
+4. We already stored SQL password in KeyVault, but for clarification.
+
+```bash
+az keyvault secret set --name SqlPaperPassword --vault-name $keyvaultName --value $SqlPaperPassword
+```
+
+Now we need to update manifest of delivery service
+
+```yaml
+    spec:
+      containers:
+        - name: tpaperdelivery
+          image: msactionregistry.azurecr.io/tpaperdelivery:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+:80
+            - name: SqlDeliveryString
+              value: [secret]
+            - name: SqlPaperPassword
+              secretKeyRef:
+                name: SqlPaperPassword
+                key: SqlPaperPassword
+      auth:
+          secretStore: azurekeyvault 
+```
+
+* Apply service component
+
+  ```bash
+  kubectl apply -f tpaperorders-deploy.yaml.yaml
+  ```
+Make sure that `secretstores.azure.keyvault` is loaded successfully in `daprd` sidecar log
+  
+  
+## Useful commands and notes.  
+
 You might need to delete all deployments
 ```cmd
 kubectl get deployments
