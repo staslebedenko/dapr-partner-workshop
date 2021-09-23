@@ -1,14 +1,13 @@
 apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
-  name: servicebus-pubsub
+  name: pubsub
   namespace: default
 spec:
   type: pubsub.azure.servicebus
   version: v1
   metadata:
   - name: connectionString # Required
-    value: "Endpoint=sb://{ServiceBusNamespace}.servicebus.windows.net/;SharedAccessKeyName={PolicyName};SharedAccessKey={Key};EntityPath={ServiceBus}"
-scopes:
+    value: "Endpoint=sb://msactiondapr.servicebus.windows.net/;SharedAccessKeyName=global;SharedAccessKey=QeJ
   - tpaperorders
   - tpaperdelivery
