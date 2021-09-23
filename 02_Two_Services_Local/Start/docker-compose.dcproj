@@ -5,8 +5,8 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>e415f4eb-60d4-4385-9e43-94732932be29</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/api/delivery/get</DockerServiceUrl>
-    <DockerServiceName>tpaperdelivery</DockerServiceName>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/api/order/create/1</DockerServiceUrl>
+    <DockerServiceName>tpaperorders</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
