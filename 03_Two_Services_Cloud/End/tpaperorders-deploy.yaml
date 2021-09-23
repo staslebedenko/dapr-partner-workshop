@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: tpaperorders
-          image: netfwdaysregistry27447.azurecr.io/tpaperorders:v2
+          image: msactionregistry.azurecr.io/tpaperorders:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -31,9 +31,9 @@ spec:
             - name: ASPNETCORE_URLS
               value: http://+:80
             - name: SqlPaperString
-              value: Server=tcp:net-fwdays-dapr27447.database.windows.net,1433;Initial Catalog=paperorders;Persist Security Info=False;User ID=FancyUser3;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+              value: Server=tcp:ms-action-dapr.database.windows.net,1433;Database=paperorders;User ID=FancyUser3;Encrypt=true;Connection Timeout=30;
             - name: SqlPaperPassword
-              value: Sup3rStr0ng5227447
+              value: Sup3rStr0ng52
 ---
 apiVersion: v1
 kind: Service
