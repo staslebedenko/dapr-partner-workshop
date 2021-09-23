@@ -336,6 +336,22 @@ kubectl apply -f rabbitmq.yaml
 kubectl apply -f pubsub-rabbitmq.yaml
 ```
 
+Then we updatings C# code and DAPR service manifest files to container v2 and building solution in Visual Studio.
+
+```cmd
+docker tag tpaperorders:latest msactionregistry.azurecr.io/tpaperorders:v2
+docker tag tpaperdelivery:latest msactionregistry.azurecr.io/tpaperdelivery:v2
+
+docker push msactionregistry.azurecr.io/tpaperorders:v2
+docker push msactionregistry.azurecr.io/tpaperdelivery:v2
+```
+
+And testing results with slightly updated endpoints
+```
+20.67.14.15/api/order/create/1
+20.67.15.202/api/deliveries/get
+```
+
 We will need following commands to get logs from AKS cluster.
 You should get correct pod names from get all command and change log command accordingly.
 
