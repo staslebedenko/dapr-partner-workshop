@@ -197,9 +197,11 @@ SQL Server connectivity.
 
 We will split Entity Framework context into two parts that can use the same(or different databases).
 
-Start folder contains monolith solution.
+Gradual split in code is a key to successful migration and can be done as a part of normal development process.
 
-End folder contains monolith with EF context split in two.
+Start folder contains monolith solution 
+
+End folder contains monolith with EF context split in two for the different schema in the same database.
 
 ## Step 2. Split in two projects, docker compose and DAPR initialization.
 We adding containerization via Visual Studio tooling and manually adding DAPR sidecar configuration for each server.
