@@ -391,11 +391,7 @@ spec:
   - name: spnClientId
     value: "88511b82-8ced-4ba3-bd9b-0599f479e870"
   - name: spnCertificate
-    secretKeyRef:
-      name: vaultsecret
-      key: msactiondapr-vaultadmincert-20210923.pfx
-auth:
-    secretStore: kubernetes
+    key: msactiondapr-vaultadmincert-20210923.pfx
 ```
 
 3. Apply azurekeyvault.yaml component
@@ -461,3 +457,7 @@ az acr repository delete --name netfwdaysregistry --repository tpaperdelivery
 az acr repository delete --name netfwdaysregistry --repository tpaperorders
 ```
 
+To cleanup docker via cmd
+```cmd
+for /F %i in ('docker images -a -q') do docker rmi -f %i
+```
