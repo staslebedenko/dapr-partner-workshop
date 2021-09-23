@@ -234,9 +234,9 @@ Lets start with CMD.
 az login
 az account set --subscription 95cd9078f8c
 az account show
-az acr login --name netfwdaysregistry
-az aks get-credentials --resource-group netfwdays-cluster --name netfwdays-cluster --overwrite-existing
-kubectl config use-context netfwdays-cluster
+az acr login --name msactionregistry
+az aks get-credentials --resource-group msaction-cluster --name msaction-cluster --overwrite-existing
+kubectl config use-context msaction-cluster
 kubectl get all
 ```
 
@@ -256,8 +256,8 @@ docker images
 ```
 Lets tag our newly built container with azure container registry name and version.
 ```cmd
-docker tag tpaperorders:latest netfwdaysregistry.azurecr.io/tpaperorders:v3
-docker tag tpaperdelivery:latest netfwdaysregistry.azurecr.io/tpaperdelivery:v1
+docker tag tpaperorders:latest msactionregistry.azurecr.io/tpaperorders:v1
+docker tag tpaperdelivery:latest msactionregistry.azurecr.io/tpaperdelivery:v1
 ```
 
 Check results with
@@ -267,8 +267,8 @@ docker images
 
 And push images to container registry
 ```cmd
-docker push netfwdaysregistry.azurecr.io/tpaperorders:v1
-docker push netfwdaysregistry.azurecr.io/tpaperdelivery:v1
+docker push msactionregistry.azurecr.io/tpaperorders:v1
+docker push msactionregistry.azurecr.io/tpaperdelivery:v1
 ```
 
 There is need to change version of container in YAML manifest files inside Step 3 End directory, and change this files each time you preparing a new version of container.
@@ -276,7 +276,7 @@ There is need to change version of container in YAML manifest files inside Step 
     spec:
       containers:
         - name: tpaperorders
-          image: netfwdaysregistry.azurecr.io/tpaperorders:v1
+          image: msactionregistry.azurecr.io/tpaperorders:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -298,15 +298,15 @@ kubectl get all
 You can use set of commands below for quick container/publish re-deployments.
 Just change version in kubernetes manifest and commands below.
 ```cmd
-docker tag tpaperorders:latest netfwdaysregistry.azurecr.io/tpaperorders:v6
+docker tag tpaperorders:latest msactionregistry.azurecr.io/tpaperorders:v2
 docker images
-docker push netfwdaysregistry.azurecr.io/tpaperorders:v6
+docker push msactionregistry.azurecr.io/tpaperorders:v2
 kubectl apply -f tpaperorders-deploy.yaml
 kubectl get all
 
-docker tag tpaperdelivery:latest netfwdaysregistry.azurecr.io/tpaperdelivery:v14
+docker tag tpaperdelivery:latest msactionregistry.azurecr.io/tpaperdelivery:v2
 docker images
-docker push netfwdaysregistry.azurecr.io/tpaperdelivery:v14
+docker push msactionregistry.azurecr.io/tpaperdelivery:v2
 kubectl apply -f tpaperdelivery-deploy.yaml
 kubectl get all
 ```
@@ -477,11 +477,12 @@ kubectl delete svc tpaperdelivery
 
 If you want to purge containers from Azure container registry
 ```cmd
-az acr repository delete --name netfwdaysregistry --repository tpaperdelivery
-az acr repository delete --name netfwdaysregistry --repository tpaperorders
+az acr repository delete --name msactionregistry --repository tpaperdelivery
+az acr repository delete --name msactionregistry --repository tpaperorders
 ```
 
-To cleanup docker via cmd
+To cleanup local docker images via cmd. It is recommended to do after each step.
+
 ```cmd
 for /F %i in ('docker images -a -q') do docker rmi -f %i
 ```
