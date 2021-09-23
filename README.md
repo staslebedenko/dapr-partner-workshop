@@ -311,6 +311,19 @@ kubectl apply -f tpaperdelivery-deploy.yaml
 kubectl get all
 ```
 
+We cam observe our deployment with get all command and checking of external public endpoints(public load balancer endpoints).
+
+```
+20.67.14.15/api/order/create/1
+20.67.15.202/api/delivery/get
+```
+
+In case of the problems we need to investigate logs via command prompt.
+
+```
+kubectl logs tpaperdelivery-8c4bdc475-j89kx daprd
+kubectl logs tpaperdelivery-8c4bdc475-j89kx tpaperdelivery
+```
 
 ## Step 4. Introduction to the DAPR pubsub.
 We will deploy DAPR pubsub component to Azure. Make changes to our code and take a look into the pod logs to see whats happening.
@@ -332,7 +345,6 @@ kubectl get all
 kubectl logs tpaperdelivery-599b8cd4b7-8nxzz daprd
 kubectl logs tpaperdelivery-599b8cd4b7-8nxzz tpaperdelivery
 ```
-
 
 ## Step 5. Secrets via Azure KeyVault and Azure functions component.
 
