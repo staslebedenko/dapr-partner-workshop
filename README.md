@@ -121,7 +121,7 @@ az monitor app-insights component create --resource-group $groupName --app $insi
 instrumentationKey=$(az monitor app-insights component show --resource-group $groupName --app $insightsName --query  "instrumentationKey" --output tsv)
 
 #----------------------------------------------------------------------------------
-# Service bus queue, application insights and Azure Key Vault
+# Azure function app with storage account
 #----------------------------------------------------------------------------------
 
 accountSku=Standard_LRS
