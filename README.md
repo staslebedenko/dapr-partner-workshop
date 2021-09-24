@@ -18,7 +18,7 @@ Good mood :).
 2. Docker Desktop to run the containerized application locally.
 https://www.docker.com/products/docker-desktop
 3. DAPR CLI installed on a local machine.
-https://docs.dapr.io/getting-started/install-dapr-cli/docker
+https://docs.dapr.io/getting-started/install-dapr-cli/
 4. Kompose tool for Kubernetes manifest generation (optional).
 https://kompose.io/getting-started/ 
 5. AZ CLI tools installation(for cloud deployment)
