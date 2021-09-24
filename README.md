@@ -205,6 +205,9 @@ Start folder contains monolith solution
 
 End folder contains monolith with EF context split in two for the different schema in the same database.
 
+
+
+
 ## Step 2. Split in two projects, docker compose and DAPR initialization.
 We adding containerization via Visual Studio tooling and manually adding DAPR sidecar configuration for each server.
 
@@ -327,6 +330,9 @@ kubectl logs tpaperdelivery-8c4bdc475-j89kx daprd
 kubectl logs tpaperdelivery-8c4bdc475-j89kx tpaperdelivery
 ```
 
+
+
+
 ## Step 4. Introduction to the DAPR pubsub.
 We will deploy DAPR pubsub component to Azure. Make changes to our code and take a look into the pod logs to see whats happening.
 
@@ -338,7 +344,7 @@ kubectl apply -f rabbitmq.yaml
 kubectl apply -f pubsub-rabbitmq.yaml
 ```
 
-Then we updatings C# code and DAPR service manifest files to container v2 and building solution in Visual Studio.
+Then we updating C# code and DAPR service manifest files to container v2 and building solution in Visual Studio.
 
 ```cmd
 docker tag tpaperorders:latest msactionregistry.azurecr.io/tpaperorders:v2
@@ -363,7 +369,41 @@ kubectl get all
 kubectl logs tpaperdelivery-599b8cd4b7-8nxzz daprd
 kubectl logs tpaperdelivery-599b8cd4b7-8nxzz tpaperdelivery
 ```
+In the folder END we have additional file for Application insight integration.
 
+Check out the file open-telemetry-collector-appinsights.yaml and replace the <INSTRUMENTATION-KEY> placeholder with your Application Insights Instrumentation Key.
+Apply the configuration with 
+	
+kubectl apply -f open-telemetry-collector-appinsights.yaml.
+
+Open collector-config.yaml file and check its content
+Apply the configuration with 
+	
+kubectl apply -f collector-config.yaml.
+
+Update services manifestst with following code and update container version to the new version.
+	
+```
+        dapr.io/log-level: debug
+        dapr.io/config: "appconfig"
+```
+	
+Rebuild solution in visual studio and deploy new container versions.
+
+```
+docker tag tpaperorders:latest msactionregistry.azurecr.io/tpaperorders:v4
+docker tag tpaperdelivery:latest msactionregistry.azurecr.io/tpaperdelivery:v4
+
+docker push msactionregistry.azurecr.io/tpaperorders:v4
+docker push msactionregistry.azurecr.io/tpaperdelivery:v4
+
+kubectl apply -f tpaperorders-deploy.yaml
+kubectl apply -f tpaperdelivery-deploy.yaml
+```
+
+	
+	
+	
 ## Step 5. Secrets via Azure KeyVault and Azure functions component.
 
 * We created an Azure Key Vault with our infrastructure beforehand. 
