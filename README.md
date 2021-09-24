@@ -534,7 +534,7 @@ Now we need to update manifest of delivery service
 * Apply service component
 
   ```bash
-  kubectl apply -f tpaperorders-deploy.yaml.yaml
+  kubectl apply -f tpaperorders-deploy.yaml
   ```
 Make sure that `secretstores.azure.keyvault` is loaded successfully in `daprd` sidecar log
   
