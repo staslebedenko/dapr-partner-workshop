@@ -470,7 +470,7 @@ Now, your service principal has access to your keyvault,  you are ready to confi
 - **vaultsecret** is secret name in Kubernetes secret store
 
 ```bash
-kubectl create secret generic vaultsecret --from-file="C:\3\msactiondapr-vaultadmincert-20210923.pfx"
+kubectl create secret generic vaultsecret2 --from-file=vaultsecret2="C:\3\msactiondapr-vaultadmincert-20210923.pfx"
 ```
 
 2. Create azurekeyvault-deploy.yaml component file
