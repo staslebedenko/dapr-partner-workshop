@@ -115,7 +115,7 @@ az servicebus namespace create --resource-group $groupName --name $namespaceName
 az servicebus queue create --resource-group $groupName --name $queueName --namespace-name $namespaceName
 serviceBusString=$(az servicebus namespace authorization-rule keys list --resource-group $groupName --namespace-name $namespaceName --name RootManageSharedAccessKey --query primaryConnectionString --output tsv)
 
-insightsName=msactiondaprlogs
+insightsName=msactiondaprlogs$postfix
 az monitor app-insights component create --resource-group $groupName --app $insightsName --location $location --kind web --application-type web --retention-time 120
 
 instrumentationKey=$(az monitor app-insights component show --resource-group $groupName --app $insightsName --query  "instrumentationKey" --output tsv)
