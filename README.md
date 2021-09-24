@@ -354,6 +354,12 @@ docker push msactionregistry.azurecr.io/tpaperorders:v2
 docker push msactionregistry.azurecr.io/tpaperdelivery:v2
 ```
 
+And then deployment via service manifests.
+```cmd
+kubectl apply -f rabbitmq.yaml
+kubectl apply -f pubsub-rabbitmq.yaml
+```
+
 And testing results with slightly updated endpoints
 ```
 20.67.14.15/api/order/create/1
