@@ -146,7 +146,7 @@ az functionapp config appsettings set --resource-group $groupName --name $applic
 az functionapp config appsettings set --resource-group $groupName --name $applicationName --settings ASPNETCORE_ENVIRONMENT=Production
 az functionapp config appsettings set --resource-group $groupName --name $applicationName --settings "StorageConnectionString=$accountConnString"
 
-keyvaultName=msActionDapr
+keyvaultName=msActionDapr$postfix
 principalName=vaultadmin
 principalCertName=vaultadmincert
 
