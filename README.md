@@ -373,14 +373,15 @@ In the folder END we have additional file for Application insight integration.
 
 Check out the file open-telemetry-collector-appinsights.yaml and replace the <INSTRUMENTATION-KEY> placeholder with your Application Insights Instrumentation Key.
 Apply the configuration with 
-	
-kubectl apply -f open-telemetry-collector-appinsights.yaml.
 
+```
+kubectl apply -f open-telemetry-collector-appinsights.yaml.
+```
 Open collector-config.yaml file and check its content
 Apply the configuration with 
-	
+```	
 kubectl apply -f collector-config.yaml.
-
+```
 Update services manifestst with following code and update container version to the new version.
 	
 ```
