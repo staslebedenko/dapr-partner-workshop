@@ -106,8 +106,9 @@ az aks update --resource-group $groupName --name $clusterName --attach-acr $regi
 #----------------------------------------------------------------------------------
 
 groupName=ms-action-dapr-extras$postfix
+location=northeurope
 az group create --name $groupName --location $location
-namespaceName=msActionDapr$RANDOM
+namespaceName=msActionDapr$postfix
 queueName=createdelivery
 
 az servicebus namespace create --resource-group $groupName --name $namespaceName --location $location
@@ -169,6 +170,7 @@ printf "\n\nRun string below in local cmd prompt to assign secret to environment
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlPaperPassword:\nsetx SqlPaperPassword \"$SqlPaperPassword\"\n\n"
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable SqlDeliveryPassword:\nsetx SqlDeliveryPassword \"$SqlPaperPassword\"\n\n"
 printf "\n\nRun string below in local cmd prompt to assign secret to environment variable AzureWebJobsStorage:\nsetx AzureWebJobsStorage \"$accountConnString\"\n\n"
+printf "\n\nRun string below in local cmd prompt to assign secret to environment variable ServiceBusString:\nsetx ServiceBusString \"$serviceBusString\"\n\n"
 
 echo "Update open-telemetry-collector-appinsights.yaml in Step 4 End => <INSTRUMENTATION-KEY> value with:  " $instrumentationKey
 ```
