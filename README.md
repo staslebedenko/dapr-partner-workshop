@@ -18,7 +18,7 @@ Good mood :).
 2. Docker Desktop to run the containerized application locally.
 https://www.docker.com/products/docker-desktop
 3. DAPR CLI installed on a local machine.
-https://docs.dapr.io/getting-started/install-dapr-cli/docker
+https://docs.dapr.io/getting-started/install-dapr-cli/
 4. Kompose tool for Kubernetes manifest generation (optional).
 https://kompose.io/getting-started/ 
 5. AZ CLI tools installation(for cloud deployment)
@@ -354,6 +354,12 @@ docker push msactionregistry.azurecr.io/tpaperorders:v2
 docker push msactionregistry.azurecr.io/tpaperdelivery:v2
 ```
 
+And then deployment via service manifests.
+```cmd
+kubectl apply -f rabbitmq.yaml
+kubectl apply -f pubsub-rabbitmq.yaml
+```
+
 And testing results with slightly updated endpoints
 ```
 20.67.14.15/api/order/create/1
@@ -464,7 +470,7 @@ Now, your service principal has access to your keyvault,  you are ready to confi
 - **vaultsecret** is secret name in Kubernetes secret store
 
 ```bash
-kubectl create secret generic vaultsecret --from-file="C:\3\msactiondapr-vaultadmincert-20210923.pfx"
+kubectl create secret generic vaultsecret2 --from-file=vaultsecret2="C:\3\msactiondapr-vaultadmincert-20210923.pfx"
 ```
 
 2. Create azurekeyvault-deploy.yaml component file
@@ -528,7 +534,7 @@ Now we need to update manifest of delivery service
 * Apply service component
 
   ```bash
-  kubectl apply -f tpaperorders-deploy.yaml.yaml
+  kubectl apply -f tpaperorders-deploy.yaml
   ```
 Make sure that `secretstores.azure.keyvault` is loaded successfully in `daprd` sidecar log
   
