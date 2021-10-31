@@ -52,6 +52,7 @@ namespace TPaperOrders
             Delivery savedDelivery = await CreateDeliveryForOrder(savedOrder, cts);
 
             Dictionary<string, string> secrets = await _daprClient.GetSecretAsync("azurekeyvault", "SqlPaperPassword");
+
             string superSecret = secrets["SqlPaperPassword"];
 
             string responseMessage = $"Accepted EDI message {order.Id} and created delivery {savedDelivery?.Id} with super secret{superSecret}";

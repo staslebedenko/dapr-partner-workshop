@@ -57,7 +57,7 @@ namespace TPaperOrders
         private async Task<DeliveryModel> CreateDeliveryForOrder(EdiOrder savedOrder, CancellationToken cts)
         {
             string url =
-                $"http://host.docker.internal:53973/api/delivery/create/{savedOrder.ClientId}/{savedOrder.Id}/{savedOrder.ProductCode}/{savedOrder.Quantity}";
+                $"http://host.docker.internal:59705/api/delivery/create/{savedOrder.ClientId}/{savedOrder.Id}/{savedOrder.ProductCode}/{savedOrder.Quantity}";
 
             using var httpClient = _clientFactory.CreateClient();
             var uriBuilder = new UriBuilder(url);

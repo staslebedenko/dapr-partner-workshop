@@ -35,6 +35,12 @@ spec:
               value: Server=tcp:ms-action-dapr.database.windows.net,1433;Database=paperorders;User ID=FancyUser3;Encrypt=true;Connection Timeout=30;
             - name: SqlPaperPassword
               value: Sup3rStr0ng52
+            - name: SuperSecret              
+              secretKeyRef:
+                name: supersecret
+                key: supersecret
+    auth:
+      secretStore: azurekeyvault 
 ---
 apiVersion: v1
 kind: Service
