@@ -155,7 +155,7 @@ az keyvault secret set --name SqlPaperPassword --vault-name $keyvaultName --valu
 
 az ad sp create-for-rbac --name $principalName --create-cert --cert $principalCertName --keyvault $keyvaultName --skip-assignment --years 3
 
-# get appId from output of this step and use commented code below to grant access.
+# get appId from output of step above and add it after --id in command below.
 
 # az ad sp show --id 88511b82-8ced-4ba3-bd9b-0599f479e870
 # get objectId from command output above and set it to command below 
